@@ -2,61 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Online - No Download</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Roblox Fullscreen Portal</title>
     <style>
-        body {
+        /* This makes the page take up 100% of the browser window */
+        body, html {
             margin: 0;
-            background-color: #111;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Prevents scrollbars */
+            background-color: #000;
         }
-        .header {
-            padding: 20px;
-            text-align: center;
+
+        .game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
-        .game-wrapper {
-            position: relative;
-            width: 90%;
-            max-width: 1000px;
-            aspect-ratio: 16 / 9;
-            border: 5px solid #333;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
+
         iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #888;
+
+        /* Small button to go back or refresh if stuck */
+        #menu {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-family: sans-serif;
+            font-size: 10px;
+            z-index: 100;
+            cursor: pointer;
+            opacity: 0.3;
         }
+        #menu:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Roblox Cloud Player</h1>
-        <p>Powered by Easyfun Technology</p>
-    </div>
+    <div id="menu" onclick="location.reload()">REFRESH GAME</div>
 
-    <div class="game-wrapper">
+    <div class="game-container">
         <iframe 
             src="https://www.easyfun.gg/games/roblox.html" 
             allow="autoplay; fullscreen; keyboard"
-            scrolling="no">
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
         </iframe>
-    </div>
-
-    <div class="footer">
-        Note: This uses cloud streaming. A fast internet connection is recommended.
     </div>
 
 </body>
