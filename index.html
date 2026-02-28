@@ -7,321 +7,140 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #050505;
-            color: #e5e5e5;
-            overflow-x: hidden;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .draggable-tool {
-            cursor: grab;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .draggable-tool:active {
-            cursor: grabbing;
-            transform: scale(0.98);
-        }
-
-        .active-tab {
-            color: #3b82f6;
-            border-bottom: 2px solid #3b82f6;
-        }
-
-        .instruction-step {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .step-number {
-            width: 24px;
-            height: 24px;
-            background: #3b82f6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .search-container {
-            position: relative;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        #bookmarkSearch:focus {
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-            border-color: rgba(59, 130, 246, 0.5);
-        }
+        body { font-family: 'Inter', sans-serif; background: #050505; color: #e5e5e5; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .active-tab { color: #3b82f6; border-bottom: 2px solid #3b82f6; }
+        .draggable-tool { cursor: grab; user-select: none; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
     </style>
 </head>
-<body>
+<body class="pt-32 pb-12 px-6">
 
-    <!-- Header / Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass-card border-b border-white/10 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <nav class="fixed top-0 left-0 w-full z-50 glass-card px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">A</div>
-            <h1 class="text-xl font-extrabold tracking-tighter uppercase">Apex<span class="text-blue-500">Extensions</span></h1>
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold">A</div>
+            <h1 class="text-xl font-black uppercase tracking-tighter">Apex<span class="text-blue-500">Extensions</span></h1>
         </div>
-        
-        <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="bookmarkSearch" placeholder="Search extensions..." 
-                   class="w-full bg-white/5 border border-white/10 rounded-full py-2 px-10 text-sm focus:outline-none transition-all"
-                   onkeyup="filterBookmarks()">
-            <svg class="absolute left-4 top-2.5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-        </div>
-
-        <div class="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest">
-            <button onclick="showSection('tools')" class="nav-link hover:text-blue-500 transition active-tab" id="nav-tools">Tools</button>
-            <button onclick="showSection('games')" class="nav-link hover:text-blue-500 transition" id="nav-games">Games</button>
-            <button onclick="showSection('pixel')" class="nav-link hover:text-blue-500 transition" id="nav-pixel">Creative</button>
+        <input type="text" id="search" placeholder="Search extensions..." onkeyup="render()" class="max-w-md w-full bg-white/5 border border-white/10 rounded-full py-2 px-6 text-sm focus:outline-none focus:border-blue-500">
+        <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest">
+            <button onclick="currTab='tool';render();" id="btn-tool" class="nav-btn active-tab">Tools</button>
+            <button onclick="currTab='game';render();" id="btn-game" class="nav-btn">Games</button>
+            <button onclick="currTab='util';render();" id="btn-util" class="nav-btn">Utilities</button>
         </div>
     </nav>
 
-    <div class="pt-32 pb-12 px-6 max-w-5xl mx-auto">
-        
-        <!-- Setup Guide -->
-        <header class="mb-12 glass-card p-6 rounded-2xl border-blue-500/30 bg-blue-500/5">
-            <h2 class="text-2xl font-extrabold mb-4 flex items-center gap-2">
-                <span class="text-blue-500">Installation Hub</span>
-            </h2>
-            <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-300">
-                <div class="instruction-step">
-                    <div class="step-number">1</div>
-                    <p>Show Bookmarks Bar: <b>Ctrl+Shift+B</b>.</p>
-                </div>
-                <div class="instruction-step">
-                    <div class="step-number">2</div>
-                    <p><b>Drag</b> the buttons below onto your bar.</p>
-                </div>
-            </div>
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-10 glass-card p-6 rounded-2xl bg-blue-500/5 border-blue-500/20">
+            <h2 class="text-xl font-bold mb-2 text-blue-400">Installation Hub</h2>
+            <p class="text-sm text-gray-400">Drag a button to your bookmarks bar (<b>Ctrl+Shift+B</b>). No deletions, only expansions.</p>
         </header>
 
-        <!-- TOOLS SECTION -->
-        <section id="section-tools" class="content-section">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="toolsGrid">
-                
-                <!-- Card 1 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Tab Disguise</h3>
-                            <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold uppercase">Privacy</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Instantly masks your tab as "Google Drive" to hide what you're browsing.</p>
-                    </div>
-                    <a href="javascript:(function(){document.title='My Drive - Google Drive';var l=document.querySelector('link[rel*=\'icon\']')||document.createElement('link');l.type='image/x-icon';l.rel='shortcut icon';l.href='https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';document.getElementsByTagName('head')[0].appendChild(l);})();" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: StealthTab
-                    </a>
-                </div>
+        <div id="grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
-                <!-- Card 2 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Video Speed X2</h3>
-                            <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold uppercase">Media</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Forces all videos on the current page to play at 2x speed.</p>
-                    </div>
-                    <a href="javascript:(function(){document.querySelectorAll('video').forEach(v=>v.playbackRate=2.0);})();" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: VideoSpeed
-                    </a>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Word Counter</h3>
-                            <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded font-bold uppercase">Utility</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Counts every word on the page and shows a total count.</p>
-                    </div>
-                    <a href="javascript:alert('Word count: ' + document.body.innerText.split(/\s+/).length);" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: WordCounter
-                    </a>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Element Remover</h3>
-                            <span class="text-[10px] bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded font-bold uppercase">Web</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Click any element on a site to delete it (Useful for annoying popups).</p>
-                    </div>
-                    <a href="javascript:(function(){document.body.style.cursor='crosshair';document.addEventListener('click',function(e){e.preventDefault();e.target.remove();},{once:true});})();" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: ZapElement
-                    </a>
-                </div>
-
-                <!-- Card 5 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Image Downloader</h3>
-                            <span class="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded font-bold uppercase">Media</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Opens all images on the page in new tabs for easy saving.</p>
-                    </div>
-                    <a href="javascript:(function(){const imgs=document.querySelectorAll('img');imgs.forEach(i=>window.open(i.src));})();" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: GrabImages
-                    </a>
-                </div>
-
-                <!-- Card 6 -->
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between bookmark-item">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold bookmark-title">Dark Mode</h3>
-                            <span class="text-[10px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded font-bold uppercase">UI</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-6 bookmark-desc">Forces a high-contrast dark mode on any light-themed website.</p>
-                    </div>
-                    <a href="javascript:(function(){const s=document.createElement('style');s.innerHTML='html{filter:invert(1) hue-rotate(180deg)}img,video{filter:invert(1) hue-rotate(180deg)}';document.head.appendChild(s);})();" 
-                       class="draggable-tool w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-blue-900/20 transition-all">
-                       Drag: InvertDark
-                    </a>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- GAMES SECTION -->
-        <section id="section-games" class="content-section hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="gamesGrid">
-                
-                <div class="glass-card p-8 rounded-2xl bookmark-item">
-                    <h3 class="text-xl font-bold mb-2 bookmark-title">Element Destroyer</h3>
-                    <p class="text-gray-400 text-sm mb-6 bookmark-desc">Destroy any website's layout with an Asteroids-style ship.</p>
-                    <a href="javascript:(function(){var s=document.createElement('script');s.src='https://kickassapp.com/kickass.js';document.body.appendChild(s);})();" 
-                       class="draggable-tool inline-block w-full text-center bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-purple-900/20 transition-all">
-                       Drag: KickAss
-                    </a>
-                </div>
-
-                <div class="glass-card p-8 rounded-2xl bookmark-item">
-                    <h3 class="text-xl font-bold mb-2 bookmark-title">Gravity Simulation</h3>
-                    <p class="text-gray-400 text-sm mb-6 bookmark-desc">Makes all elements on the page fall to the bottom with physics.</p>
-                    <a href="javascript:(function(){var s=document.createElement('script');s.src='https://cdn.rawgit.com/alex-miller/box2d-bookmarks/master/gravity.js';document.body.appendChild(s);})();" 
-                       class="draggable-tool inline-block w-full text-center bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-white shadow-lg shadow-purple-900/20 transition-all">
-                       Drag: GravityMode
-                    </a>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- CREATIVE SECTION -->
-        <section id="section-pixel" class="content-section hidden">
-            <div class="glass-card p-8 rounded-2xl text-center bookmark-item">
-                <h3 class="text-2xl font-bold mb-4 bookmark-title">Floating Sketchpad</h3>
-                <p class="text-gray-400 text-sm mb-6 max-w-lg mx-auto bookmark-desc">Click cells to draw. Use this to doodle ideas while researching without leaving the tab.</p>
-                <a href="javascript:(function(){const e=document.createElement('div');e.style='position:fixed;bottom:20px;left:20px;z-index:10000;background:#111;padding:10px;border:2px solid #3b82f6;border-radius:10px;display:grid;grid-template-columns:repeat(16,12px);gap:1px;';for(let i=0;i<256;i++){const s=document.createElement('div');s.style='width:12px;height:12px;background:#222;';s.onclick=()=>{s.style.background='#3b82f6'};e.appendChild(s)}const c=document.createElement('button');c.innerText='X';c.style='position:absolute;top:-10px;right:-10px;background:red;color:white;border-radius:50%;width:20px;height:20px;border:none;cursor:pointer;';c.onclick=()=>e.remove();e.appendChild(c);document.body.appendChild(e);})();" 
-                   class="draggable-tool inline-block bg-green-600 hover:bg-green-500 px-12 py-4 rounded-xl font-bold text-white text-xl shadow-lg shadow-green-900/20 transition-all">
-                   Drag: SketchPad
-                </a>
-            </div>
-        </section>
-
-        <!-- HELP OUT SECTION -->
-        <footer class="mt-20 border-t border-white/10 pt-10 text-center">
-            <h4 class="text-xl font-bold mb-4">Community Contributions</h4>
-            <p class="text-gray-400 text-sm mb-6 max-w-xl mx-auto">
-                Have a script that makes browsing better? Send us your JavaScript code or UI improvement ideas.
-            </p>
-            <a href="mailto:support@apexextensions.com?subject=JavaScript Submission&body=Paste your code here and tell us what it does:" 
-               class="inline-block border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-blue-500/10">
-               Submit JavaScript Code
-            </a>
+        <footer class="mt-20 pt-10 border-t border-white/10 text-center">
+            <h4 class="text-lg font-bold mb-4">Community & Support</h4>
+            <p class="text-sm text-gray-400 mb-6">Found a bug or have a new script? We never delete contributions.</p>
+            <a href="mailto:support@apexextensions.com" class="inline-block border border-blue-500 text-blue-500 px-8 py-3 rounded-full font-bold hover:bg-blue-500 hover:text-white transition">Submit Code via Email</a>
         </footer>
-
     </div>
 
     <script>
-        function showSection(id) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('section-' + id).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
-            document.getElementById('nav-' + id).classList.add('active-tab');
-            
-            // Clear search when switching sections
-            document.getElementById('bookmarkSearch').value = '';
-            filterBookmarks();
-        }
+        let currTab = 'tool';
+        const data = [
+            /* TOOLS - PREVIOUS */
+            { id: 'tool', t: 'Tab Disguise', d: 'Masks tab as Google Drive.', c: "javascript:(function(){document.title='My Drive';var l=document.createElement('link');l.rel='icon';l.href='https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';document.head.appendChild(l);})();", b: 'Privacy' },
+            { id: 'tool', t: 'Video Speed X2', d: 'Forces 2x playback speed.', c: "javascript:(function(){document.querySelectorAll('video').forEach(v=>v.playbackRate=2);})();", b: 'Media' },
+            { id: 'tool', t: 'Zap Element', d: 'Click any element to delete it.', c: "javascript:(function(){document.body.style.cursor='crosshair';document.addEventListener('click',e=>{e.preventDefault();e.target.remove();},{once:true});})();", b: 'Web' },
+            { id: 'tool', t: 'Auto-Scroll', d: 'Slowly scrolls the page for you.', c: "javascript:(function(){setInterval(()=>window.scrollBy(0,1),20);})();", b: 'Utility' },
+            { id: 'tool', t: 'Focus Mode', d: 'Removes sidebars and headers.', c: "javascript:(function(){document.querySelectorAll('aside,nav,footer,header').forEach(e=>e.remove());})();", b: 'UI' },
+            { id: 'tool', t: 'Font Swap', d: 'Changes all text to Comic Sans.', c: "javascript:(function(){document.body.style.fontFamily='Comic Sans MS';})();", b: 'Fun' },
+            { id: 'tool', t: 'Image Extractor', d: 'Opens all page images in new tabs.', c: "javascript:(function(){document.querySelectorAll('img').forEach(i=>window.open(i.src));})();", b: 'Media' },
+            { id: 'tool', t: 'Word Counter', d: 'Shows word and character count.', c: "javascript:(function(){const t=document.body.innerText;alert('Words: '+t.split(/\\s+/).length+'\\nChars: '+t.length);})();", b: 'Stats' },
+            /* TOOLS - NEW */
+            { id: 'tool', t: 'Highlighter', d: 'Turns your mouse into a yellow highlighter.', c: "javascript:(function(){document.body.style.cursor='crosshair';document.addEventListener('mousedown',function(e){const s=document.createElement('span');s.style='background:yellow;position:absolute;width:10px;height:10px;border-radius:50%;left:'+e.pageX+'px;top:'+e.pageY+'px;pointer-events:none;z-index:99999;';document.body.appendChild(s);document.onmousemove=f=>{const ss=s.cloneNode();ss.style.left=f.pageX+'px';ss.style.top=f.pageY+'px';document.body.appendChild(ss);};document.onmouseup=()=>{document.onmousemove=null;};});})();", b: 'Edit' },
+            { id: 'tool', t: 'Text Reverser', d: 'Flips all text on the page backward.', c: "javascript:(function(){const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);while(node=walk.nextNode()){node.nodeValue=node.nodeValue.split('').reverse().join('');}})();", b: 'Fun' },
+            { id: 'tool', t: 'Page Magnifier', d: 'Zooms in on the area around your mouse.', c: "javascript:(function(){const m=document.createElement('div');m.style='position:fixed;width:200px;height:200px;border:3px solid #3b82f6;border-radius:50%;overflow:hidden;z-index:100000;pointer-events:none;display:none;';document.body.appendChild(m);document.onmousemove=e=>{m.style.display='block';m.style.left=(e.clientX-100)+'px';m.style.top=(e.clientY-100)+'px';document.body.style.transform='scale(1.5)';document.body.style.transformOrigin=e.clientX+'px '+e.clientY+'px';};document.onclick=()=>{document.body.style.transform='';m.remove();document.onmousemove=null;};})();", b: 'Access' },
 
-        function filterBookmarks() {
-            const query = document.getElementById('bookmarkSearch').value.toLowerCase();
-            const items = document.querySelectorAll('.bookmark-item');
+            /* GAMES - PREVIOUS */
+            { id: 'game', t: 'KickAss', d: 'Destroy the site with a ship.', c: "javascript:(function(){var s=document.createElement('script');s.src='https://kickassapp.com/kickass.js';document.body.appendChild(s);})();", b: 'Game' },
+            { id: 'game', t: 'Gravity', d: 'Elements fall with physics.', c: "javascript:(function(){var s=document.createElement('script');s.src='https://cdn.rawgit.com/alex-miller/box2d-bookmarks/master/gravity.js';document.body.appendChild(s);})();", b: 'Game' },
+            { id: 'game', t: 'Snake Game', d: 'Retro snake in a small popup.', c: "javascript:(function(){const d=document.createElement('div');d.style='position:fixed;top:10px;right:10px;z-index:9999;background:#000;border:1px solid #3b82f6;padding:5px;';d.innerHTML='<canvas id=sc width=160 height=160></canvas>';document.body.appendChild(d);const c=document.getElementById('sc'),x=c.getContext('2d');let s=[{x:8,y:8}],dv='r';function g(){x.fillStyle='#000';x.fillRect(0,0,160,160);x.fillStyle='#0f0';s.forEach(p=>x.fillRect(p.x*10,p.y*10,9,9));let h={...s[0]};if(dv=='r')h.x++;if(dv=='l')h.x--;if(dv=='u')h.y--;if(dv=='d')h.y++;s.unshift(h);s.pop();setTimeout(g,100)}document.onkeydown=e=>{if(e.key=='ArrowRight')dv='r';if(e.key=='ArrowLeft')dv='l';if(e.key=='ArrowUp')dv='u';if(e.key=='ArrowDown')dv='d'};g();})();", b: 'Game' },
+            /* GAMES - NEW */
+            { id: 'game', t: 'Confetti Rain', d: 'Bursts confetti all over the page.', c: "javascript:(function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';s.onload=()=>{confetti({particleCount:150,spread:70,origin:{y:0.6}});};document.head.appendChild(s);})();", b: 'Party' },
+
+            /* UTILITIES - PREVIOUS */
+            { id: 'util', t: 'Sticky Note', d: 'Adds an editable note to the page.', c: "javascript:(function(){const n=document.createElement('div');n.contentEditable=true;n.style='position:fixed;top:50px;left:50px;width:200px;height:200px;background:#ff9;color:#333;padding:10px;z-index:10000;box-shadow:5px 5px 10px rgba(0,0,0,0.3);';n.innerText='Type here...';document.body.appendChild(n);})();", b: 'Util' },
+            { id: 'util', t: 'Color Picker', d: 'Tells you the hex code of what you click.', c: "javascript:(function(){document.addEventListener('click',e=>{alert('Color: '+getComputedStyle(e.target).backgroundColor);},{once:true});})();", b: 'Design' },
+            { id: 'util', t: 'Tab Hook', d: 'Prevents closing the tab by accident.', c: "javascript:window.onbeforeunload=function(){return 'Are you sure?';};alert('Tab Hooked!');", b: 'Security' },
+            { id: 'util', t: 'Break Timer', d: 'Alerts you in 20 minutes.', c: "javascript:alert('Timer started for 20m');setTimeout(()=>alert('Take a break!'),1200000);", b: 'Health' },
+            /* UTILITIES - NEW */
+            { id: 'util', t: 'Dark Mode Fix', d: 'Inverts brightness for night reading.', c: "javascript:(function(){const s=document.createElement('style');s.innerHTML='html{filter:invert(1) hue-rotate(180deg)!important}img,video{filter:invert(1) hue-rotate(180deg)!important}';document.head.appendChild(s);})();", b: 'UI' },
+            { id: 'util', t: 'QR Generator', d: 'Creates a QR code for the current URL.', c: "javascript:(function(){window.open('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(location.href));})();", b: 'Sharing' },
+            { id: 'util', t: 'Password Gen', d: 'Generates a strong random password.', c: "javascript:(function(){const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';let p='';for(let i=0;i<16;i++)p+=c.charAt(Math.floor(Math.random()*c.length));alert('Password: '+p);})();", b: 'Security' }
+        ];
+
+        function render() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
             
-            items.forEach(item => {
-                const title = item.querySelector('.bookmark-title').innerText.toLowerCase();
-                const desc = item.querySelector('.bookmark-desc').innerText.toLowerCase();
-                
-                if (title.includes(query) || desc.includes(query)) {
-                    item.style.display = 'flex';
-                    if (item.tagName === 'DIV' && !item.classList.contains('flex-col')) {
-                        item.style.display = 'block'; // for the creative section
-                    }
-                } else {
-                    item.style.display = 'none';
-                }
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
+            const activeBtn = document.getElementById('btn-' + currTab);
+            if(activeBtn) activeBtn.classList.add('active-tab');
+
+            const filtered = data.filter(i => i.id === currTab && (i.t + i.d + i.b).toLowerCase().includes(query));
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = '<p class="text-gray-500 italic col-span-2 text-center py-10">No extensions found in this category.</p>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <h3 class="font-bold text-lg">${item.t}</h3>
+                                <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded uppercase font-bold text-blue-300">${item.b}</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-6">${item.d}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${item.c}" onclick="event.preventDefault();toast('☝️ Drag to Bookmarks Bar');" class="draggable-tool flex-1 bg-blue-600 py-3 rounded-xl text-center font-bold text-sm hover:bg-blue-500 transition shadow-lg shadow-blue-600/20">Drag: ${item.t.split(' ')[0]}</a>
+                            <button onclick="copyCode(\`${item.c}\`)" class="bg-white/5 hover:bg-white/10 px-4 rounded-xl transition text-xs font-bold border border-white/10">Code</button>
+                        </div>
+                    </div>`;
             });
         }
 
-        // Interactivity for Draggable Tools
-        document.querySelectorAll('.draggable-tool').forEach(link => {
-            link.addEventListener('click', (e) => {
-                if(link.getAttribute('href').startsWith('javascript:')) {
-                    e.preventDefault();
-                    showDragToast();
-                }
-            });
-        });
-
-        function showDragToast() {
-            const existing = document.getElementById('drag-toast');
-            if(existing) existing.remove();
-
-            const msg = document.createElement('div');
-            msg.id = 'drag-toast';
-            msg.style = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#3b82f6;color:white;padding:12px 24px;border-radius:12px;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,0.5);font-weight:bold;font-size:14px;pointer-events:none;animation: fadeInUp 0.3s ease-out;";
-            msg.innerHTML = "☝️ Drag this to your Bookmarks Bar (Ctrl+Shift+B)";
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 2500);
+        async function copyCode(code) {
+            try {
+                await navigator.clipboard.writeText(code);
+                toast("✅ Code copied to clipboard!");
+            } catch (err) {
+                // Fallback for document.execCommand
+                const el = document.createElement('textarea');
+                el.value = code;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                toast("✅ Code copied!");
+            }
         }
+
+        function toast(text) {
+            const m = document.createElement('div');
+            m.style = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#3b82f6;color:white;padding:12px 24px;border-radius:12px;z-index:100;font-weight:bold;animation:fadeInUp 0.3s;box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);";
+            m.innerText = text;
+            document.body.appendChild(m);
+            setTimeout(() => m.remove(), 2000);
+        }
+        render();
     </script>
-
-    <style>
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translate(-50%, 20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
-    </style>
 </body>
 </html>
