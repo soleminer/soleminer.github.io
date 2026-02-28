@@ -43,15 +43,15 @@
 
         <footer class="mt-20 pt-10 border-t border-white/10 text-center">
             <h4 class="text-lg font-bold mb-4">Community & Support</h4>
-            <p class="text-sm text-gray-400 mb-6">Found a bug or have a new script? We never delete contributions.</p>
-            <a href="mailto:support@apexextensions.com" class="inline-block border border-blue-500 text-blue-500 px-8 py-3 rounded-full font-bold hover:bg-blue-500 hover:text-white transition">Submit Code via Email</a>
+            <p class="text-sm text-gray-400 mb-6">Found a bug or have a new script? Reach out to us directly.</p>
+            <a href="mailto:shiftrandom7@gmail.com" class="inline-block border border-blue-500 text-blue-500 px-8 py-3 rounded-full font-bold hover:bg-blue-500 hover:text-white transition">Email shiftrandom7@gmail.com to support</a>
         </footer>
     </div>
 
     <script>
         let currTab = 'tool';
         const data = [
-            /* TOOLS - PREVIOUS */
+            /* TOOLS */
             { id: 'tool', t: 'Tab Disguise', d: 'Masks tab as Google Drive.', c: "javascript:(function(){document.title='My Drive';var l=document.createElement('link');l.rel='icon';l.href='https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';document.head.appendChild(l);})();", b: 'Privacy' },
             { id: 'tool', t: 'Video Speed X2', d: 'Forces 2x playback speed.', c: "javascript:(function(){document.querySelectorAll('video').forEach(v=>v.playbackRate=2);})();", b: 'Media' },
             { id: 'tool', t: 'Zap Element', d: 'Click any element to delete it.', c: "javascript:(function(){document.body.style.cursor='crosshair';document.addEventListener('click',e=>{e.preventDefault();e.target.remove();},{once:true});})();", b: 'Web' },
@@ -60,27 +60,28 @@
             { id: 'tool', t: 'Font Swap', d: 'Changes all text to Comic Sans.', c: "javascript:(function(){document.body.style.fontFamily='Comic Sans MS';})();", b: 'Fun' },
             { id: 'tool', t: 'Image Extractor', d: 'Opens all page images in new tabs.', c: "javascript:(function(){document.querySelectorAll('img').forEach(i=>window.open(i.src));})();", b: 'Media' },
             { id: 'tool', t: 'Word Counter', d: 'Shows word and character count.', c: "javascript:(function(){const t=document.body.innerText;alert('Words: '+t.split(/\\s+/).length+'\\nChars: '+t.length);})();", b: 'Stats' },
-            /* TOOLS - NEW */
             { id: 'tool', t: 'Highlighter', d: 'Turns your mouse into a yellow highlighter.', c: "javascript:(function(){document.body.style.cursor='crosshair';document.addEventListener('mousedown',function(e){const s=document.createElement('span');s.style='background:yellow;position:absolute;width:10px;height:10px;border-radius:50%;left:'+e.pageX+'px;top:'+e.pageY+'px;pointer-events:none;z-index:99999;';document.body.appendChild(s);document.onmousemove=f=>{const ss=s.cloneNode();ss.style.left=f.pageX+'px';ss.style.top=f.pageY+'px';document.body.appendChild(ss);};document.onmouseup=()=>{document.onmousemove=null;};});})();", b: 'Edit' },
             { id: 'tool', t: 'Text Reverser', d: 'Flips all text on the page backward.', c: "javascript:(function(){const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);while(node=walk.nextNode()){node.nodeValue=node.nodeValue.split('').reverse().join('');}})();", b: 'Fun' },
             { id: 'tool', t: 'Page Magnifier', d: 'Zooms in on the area around your mouse.', c: "javascript:(function(){const m=document.createElement('div');m.style='position:fixed;width:200px;height:200px;border:3px solid #3b82f6;border-radius:50%;overflow:hidden;z-index:100000;pointer-events:none;display:none;';document.body.appendChild(m);document.onmousemove=e=>{m.style.display='block';m.style.left=(e.clientX-100)+'px';m.style.top=(e.clientY-100)+'px';document.body.style.transform='scale(1.5)';document.body.style.transformOrigin=e.clientX+'px '+e.clientY+'px';};document.onclick=()=>{document.body.style.transform='';m.remove();document.onmousemove=null;};})();", b: 'Access' },
+            { id: 'tool', t: 'YT Thumb Grab', d: 'Get the high-res thumbnail of the current video.', c: "javascript:(function(){const id=new URLSearchParams(window.location.search).get('v');if(id)window.open('https://img.youtube.com/vi/'+id+'/maxresdefault.jpg');else alert('Not a YT video');})();", b: 'YouTube' },
 
-            /* GAMES - PREVIOUS */
+            /* GAMES */
             { id: 'game', t: 'KickAss', d: 'Destroy the site with a ship.', c: "javascript:(function(){var s=document.createElement('script');s.src='https://kickassapp.com/kickass.js';document.body.appendChild(s);})();", b: 'Game' },
             { id: 'game', t: 'Gravity', d: 'Elements fall with physics.', c: "javascript:(function(){var s=document.createElement('script');s.src='https://cdn.rawgit.com/alex-miller/box2d-bookmarks/master/gravity.js';document.body.appendChild(s);})();", b: 'Game' },
             { id: 'game', t: 'Snake Game', d: 'Retro snake in a small popup.', c: "javascript:(function(){const d=document.createElement('div');d.style='position:fixed;top:10px;right:10px;z-index:9999;background:#000;border:1px solid #3b82f6;padding:5px;';d.innerHTML='<canvas id=sc width=160 height=160></canvas>';document.body.appendChild(d);const c=document.getElementById('sc'),x=c.getContext('2d');let s=[{x:8,y:8}],dv='r';function g(){x.fillStyle='#000';x.fillRect(0,0,160,160);x.fillStyle='#0f0';s.forEach(p=>x.fillRect(p.x*10,p.y*10,9,9));let h={...s[0]};if(dv=='r')h.x++;if(dv=='l')h.x--;if(dv=='u')h.y--;if(dv=='d')h.y++;s.unshift(h);s.pop();setTimeout(g,100)}document.onkeydown=e=>{if(e.key=='ArrowRight')dv='r';if(e.key=='ArrowLeft')dv='l';if(e.key=='ArrowUp')dv='u';if(e.key=='ArrowDown')dv='d'};g();})();", b: 'Game' },
-            /* GAMES - NEW */
             { id: 'game', t: 'Confetti Rain', d: 'Bursts confetti all over the page.', c: "javascript:(function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';s.onload=()=>{confetti({particleCount:150,spread:70,origin:{y:0.6}});};document.head.appendChild(s);})();", b: 'Party' },
+            { id: 'game', t: 'Spin Page', d: 'Makes the entire page rotate slowly.', c: "javascript:(function(){let r=0;setInterval(()=>{r+=1;document.body.style.transform='rotate('+r+'deg)';},50);})();", b: 'Chaos' },
 
-            /* UTILITIES - PREVIOUS */
+            /* UTILITIES */
             { id: 'util', t: 'Sticky Note', d: 'Adds an editable note to the page.', c: "javascript:(function(){const n=document.createElement('div');n.contentEditable=true;n.style='position:fixed;top:50px;left:50px;width:200px;height:200px;background:#ff9;color:#333;padding:10px;z-index:10000;box-shadow:5px 5px 10px rgba(0,0,0,0.3);';n.innerText='Type here...';document.body.appendChild(n);})();", b: 'Util' },
             { id: 'util', t: 'Color Picker', d: 'Tells you the hex code of what you click.', c: "javascript:(function(){document.addEventListener('click',e=>{alert('Color: '+getComputedStyle(e.target).backgroundColor);},{once:true});})();", b: 'Design' },
             { id: 'util', t: 'Tab Hook', d: 'Prevents closing the tab by accident.', c: "javascript:window.onbeforeunload=function(){return 'Are you sure?';};alert('Tab Hooked!');", b: 'Security' },
             { id: 'util', t: 'Break Timer', d: 'Alerts you in 20 minutes.', c: "javascript:alert('Timer started for 20m');setTimeout(()=>alert('Take a break!'),1200000);", b: 'Health' },
-            /* UTILITIES - NEW */
             { id: 'util', t: 'Dark Mode Fix', d: 'Inverts brightness for night reading.', c: "javascript:(function(){const s=document.createElement('style');s.innerHTML='html{filter:invert(1) hue-rotate(180deg)!important}img,video{filter:invert(1) hue-rotate(180deg)!important}';document.head.appendChild(s);})();", b: 'UI' },
             { id: 'util', t: 'QR Generator', d: 'Creates a QR code for the current URL.', c: "javascript:(function(){window.open('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(location.href));})();", b: 'Sharing' },
-            { id: 'util', t: 'Password Gen', d: 'Generates a strong random password.', c: "javascript:(function(){const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';let p='';for(let i=0;i<16;i++)p+=c.charAt(Math.floor(Math.random()*c.length));alert('Password: '+p);})();", b: 'Security' }
+            { id: 'util', t: 'Password Gen', d: 'Generates a strong random password.', c: "javascript:(function(){const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';let p='';for(let i=0;i<16;i++)p+=c.charAt(Math.floor(Math.random()*c.length));alert('Password: '+p);})();", b: 'Security' },
+            { id: 'util', t: 'Speak Selection', d: 'Reads aloud any text you have selected.', c: "javascript:(function(){const s=window.getSelection().toString();if(s)speechSynthesis.speak(new SpeechSynthesisUtterance(s));else alert('Select text first');})();", b: 'Audio' },
+            { id: 'util', t: 'Translator', d: 'Quickly translates page to English.', c: "javascript:(function(){location.href='https://translate.google.com/translate?sl=auto&tl=en&u='+encodeURIComponent(location.href);})();", b: 'Language' }
         ];
 
         function render() {
@@ -122,7 +123,6 @@
                 await navigator.clipboard.writeText(code);
                 toast("✅ Code copied to clipboard!");
             } catch (err) {
-                // Fallback for document.execCommand
                 const el = document.createElement('textarea');
                 el.value = code;
                 document.body.appendChild(el);
